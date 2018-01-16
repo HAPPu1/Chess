@@ -15,9 +15,10 @@ public class MainActivity extends AppCompatActivity {
     private static final int WHITE_BISHOP = R.drawable.wb, BLACK_BISHOP = R.drawable.bb;
     private static final int WHITE_QUEEN = R.drawable.wq, BLACK_QUEEN = R.drawable.bq;
     private static final int WHITE_KING = R.drawable.wk, BLACK_KING = R.drawable.bk;
-    private static boolean IS_TROOPS_SELECTED = false, WHICH_TROOPS_TURNS = false,KING_CHECK=false,CHECK_MATE=false;
+    private static boolean IS_TROOPS_SELECTED = false, WHICH_TROOPS_TURNS = false, KING_CHECK = false, CHECK_MATE = false;
     private static int PREVIOUS_I, PREVIOUS_J;
     public ImageView[][] chess_array;
+    public ImageView check_event;
     private int[][] troops = new int[8][8];
     private int[][] putTroops = new int[8][8];
     private int[][] troops_img = {{R.drawable.wp, R.drawable.wr, R.drawable.wn, R.drawable.wb, R.drawable.wq, R.drawable.wk},
@@ -31,14 +32,16 @@ public class MainActivity extends AppCompatActivity {
             {R.id.a7, R.id.b7, R.id.c7, R.id.d7, R.id.e7, R.id.f7, R.id.g7, R.id.h7},
             {R.id.a8, R.id.b8, R.id.c8, R.id.d8, R.id.e8, R.id.f8, R.id.g8, R.id.h8}};
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        WHICH_TROOPS_TURNS=false;
+        WHICH_TROOPS_TURNS = false;
         chess_array = new ImageView[8][8];
+        check_event = findViewById(R.id.check_event);
         initializeChessElement();
         setInitialTroops();
         for (int i = 0; i < 8; i++) {
@@ -112,8 +115,8 @@ public class MainActivity extends AppCompatActivity {
         v.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (!whichTroopsTurns()&&!CHECK_MATE) {
-                    if (isTroop(i, j)&&!isBlackTroops(i,j)) {
+                if (!whichTroopsTurns() && !CHECK_MATE) {
+                    if (isTroop(i, j) && !isBlackTroops(i, j)) {
                         if (isSelected()) {
                             resetColor();
                             resetPutTroops();
@@ -165,8 +168,20 @@ public class MainActivity extends AppCompatActivity {
                                 troops[i][j] = troops[PREVIOUS_I][PREVIOUS_J];
                                 troops[PREVIOUS_I][PREVIOUS_J] = 0;
                                 chess_array[PREVIOUS_I][PREVIOUS_J].setImageResource(0);
-                                resetColor();
                                 resetPutTroops();
+                                if (setKingCheck()) {
+                                    if (isCheckMate()) {
+
+                                    } else {
+                                        //todo
+                                        check_event.setImageResource(R.drawable.check);
+                                    }
+
+                                } else if (isStalemate()) {
+
+                                }
+                                resetColor();
+                                KING_CHECK = false;
                                 IS_TROOPS_SELECTED = false;
                                 WHICH_TROOPS_TURNS = true;
                             } else {
@@ -177,8 +192,8 @@ public class MainActivity extends AppCompatActivity {
                         }
                     }
                 }
-                if (whichTroopsTurns()&&!CHECK_MATE) {
-                    if (isTroop(i, j)&&isBlackTroops(i,j)) {
+                if (whichTroopsTurns() && !CHECK_MATE) {
+                    if (isTroop(i, j) && isBlackTroops(i, j)) {
                         if (isSelected()) {
                             resetColor();
                             resetPutTroops();
@@ -232,8 +247,19 @@ public class MainActivity extends AppCompatActivity {
                                 troops[i][j] = troops[PREVIOUS_I][PREVIOUS_J];
                                 troops[PREVIOUS_I][PREVIOUS_J] = 0;
                                 chess_array[PREVIOUS_I][PREVIOUS_J].setImageResource(0);
-                                resetColor();
                                 resetPutTroops();
+                                if (setKingCheck()) {
+                                    if (isCheckMate()) {
+
+                                    } else {
+                                        //todo
+                                        check_event.setImageResource(R.drawable.check);
+                                    }
+                                } else if (isStalemate()) {
+
+                                }
+                                KING_CHECK = false;
+                                resetColor();
                                 IS_TROOPS_SELECTED = false;
                                 WHICH_TROOPS_TURNS = false;
                             } else {
@@ -862,15 +888,142 @@ public class MainActivity extends AppCompatActivity {
         return WHICH_TROOPS_TURNS;
     }
 
+    protected boolean setKingCheck() {
+        if (!WHICH_TROOPS_TURNS) {
+            for (int i = 0; i < 8; ++i) {
+                for (int j = 0; j < 8; ++j) {
+                    if (!isBlackTroops(i, j)) {
+                        if (troops[i][j] == WHITE_PAWN) {
+                            whitePawnSelected(i, j);
+                            for (int x = 0; x < 8; x++) {
+                                for (int y = 0; y < 8; ++y) {
+                                    if (putTroops[x][y] == 1 && troops[x][y] == BLACK_KING) {
+                                        KING_CHECK = true;
+                                    }
+                                }
+                            }
+                        } else if (troops[i][j] == WHITE_ROOK) {
+                            rookSelected(i, j);
+                            for (int x = 0; x < 8; x++) {
+                                for (int y = 0; y < 8; ++y) {
+                                    if (putTroops[x][y] == 1 && troops[x][y] == BLACK_KING) {
+                                        KING_CHECK = true;
+                                    }
+                                }
+                            }
+                        } else if (troops[i][j] == WHITE_BISHOP) {
+                            bishopSelected(i, j);
+                            for (int x = 0; x < 8; x++) {
+                                for (int y = 0; y < 8; ++y) {
+                                    if (putTroops[x][y] == 1 && troops[x][y] == BLACK_KING) {
+                                        KING_CHECK = true;
+                                    }
+                                }
+                            }
+                        } else if (troops[i][j] == WHITE_KNIGHT) {
+                            knightSelected(i, j);
+                            for (int x = 0; x < 8; x++) {
+                                for (int y = 0; y < 8; ++y) {
+                                    if (putTroops[x][y] == 1 && troops[x][y] == BLACK_KING) {
+                                        KING_CHECK = true;
+                                    }
+                                }
+                            }
+                        } else {
+                            if (troops[i][j] == WHITE_QUEEN) {
+                                queenSelected(i, j);
+                                for (int x = 0; x < 8; x++) {
+                                    for (int y = 0; y < 8; ++y) {
+                                        if (putTroops[x][y] == 1 && troops[x][y] == BLACK_KING) {
+                                            KING_CHECK = true;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        if (WHICH_TROOPS_TURNS) {
+            for (int i = 0; i < 8; ++i) {
+                for (int j = 0; j < 8; ++j) {
+                    if (isBlackTroops(i, j)) {
+                        if (troops[i][j] == BLACK_PAWN) {
+                            blackPawnSelected(i, j);
+                            for (int x = 0; x < 8; x++) {
+                                for (int y = 0; y < 8; ++y) {
+                                    if (putTroops[x][y] == 1 && troops[x][y] == WHITE_KING) {
+                                        KING_CHECK = true;
+                                    }
+                                }
+                            }
+                        } else if (troops[i][j] == BLACK_ROOK) {
+                            rookSelected(i, j);
+                            for (int x = 0; x < 8; x++) {
+                                for (int y = 0; y < 8; ++y) {
+                                    if (putTroops[x][y] == 1 && troops[x][y] == WHITE_KING) {
+                                        KING_CHECK = true;
+                                    }
+                                }
+                            }
+                        } else if (troops[i][j] == BLACK_BISHOP) {
+                            bishopSelected(i, j);
+                            for (int x = 0; x < 8; x++) {
+                                for (int y = 0; y < 8; ++y) {
+                                    if (putTroops[x][y] == 1 && troops[x][y] == WHITE_KING) {
+                                        KING_CHECK = true;
+                                    }
+                                }
+                            }
+                        } else if (troops[i][j] == BLACK_KNIGHT) {
+                            knightSelected(i, j);
+                            for (int x = 0; x < 8; x++) {
+                                for (int y = 0; y < 8; ++y) {
+                                    if (putTroops[x][y] == 1 && troops[x][y] == WHITE_KING) {
+                                        KING_CHECK = true;
+                                    }
+                                }
+                            }
+                        } else {
+                            if (troops[i][j] == BLACK_QUEEN) {
+                                queenSelected(i, j);
+                                for (int x = 0; x < 8; x++) {
+                                    for (int y = 0; y < 8; ++y) {
+                                        if (putTroops[x][y] == 1 && troops[x][y] == WHITE_KING) {
+                                            KING_CHECK = true;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        resetPutTroops();
+        return KING_CHECK;
+    }
+
+    protected boolean isCheckMate() {
+        //todo
+        return false;
+    }
+
+    protected boolean isStalemate() {
+        //todo
+        return false;
+    }
+
     protected void resetChessGame() {
         for (int i = 0; i < 8; i++) {
             for (int j = 0; j < 8; j++) {
                 chess_array[i][j].setImageResource(0);
             }
         }
-        WHICH_TROOPS_TURNS=false;
-        KING_CHECK=false;
-        CHECK_MATE=false;
+        WHICH_TROOPS_TURNS = false;
+        KING_CHECK = false;
+        CHECK_MATE = false;
         setInitialTroops();
         resetColor();
         resetPutTroops();

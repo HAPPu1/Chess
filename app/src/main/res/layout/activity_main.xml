@@ -25,8 +25,8 @@
         android:layout_width="match_parent"
         android:layout_height="@dimen/default_value"
         android:layout_marginTop="1dp"
-        android:background="@drawable/chess_background_image"
         android:layout_weight="3"
+        android:background="@drawable/chess_background_image"
         android:orientation="vertical">
 
         <LinearLayout
@@ -556,6 +556,12 @@
         android:layout_width="match_parent"
         android:layout_height="@dimen/default_value"
         android:layout_weight="1">
+        <ImageView
+            android:id="@+id/check_event"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginTop="@dimen/small_margin"
+            android:padding="@dimen/default_margin"/>
 
     </LinearLayout>
 
