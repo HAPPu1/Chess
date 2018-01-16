@@ -20,7 +20,7 @@ public class MainActivity extends AppCompatActivity {
     public ImageView[][] chess_array;
     public ImageView check_event;
     private int[][] troops = new int[8][8];
-    private int[][] putTroops = new int[8][8];
+    private int[][] putTroops = new int[8][8], tempPutTroops = new int[8][8];
     private int[][] troops_img = {{R.drawable.wp, R.drawable.wr, R.drawable.wn, R.drawable.wb, R.drawable.wq, R.drawable.wk},
             {R.drawable.bp, R.drawable.br, R.drawable.bn, R.drawable.bb, R.drawable.bq, R.drawable.bk}};
     private int[][] imageView_id = {{R.id.a1, R.id.b1, R.id.c1, R.id.d1, R.id.e1, R.id.f1, R.id.g1, R.id.h1},
@@ -78,7 +78,7 @@ public class MainActivity extends AppCompatActivity {
     protected void initializeChessElement() {
         for (int i = 0; i < 8; ++i) {
             for (int j = 0; j < 8; ++j) {
-                chess_array[i][j] = (ImageView) findViewById(imageView_id[i][j]);
+                chess_array[i][j] = findViewById(imageView_id[i][j]);
             }
         }
     }
@@ -119,57 +119,86 @@ public class MainActivity extends AppCompatActivity {
                     if (isTroop(i, j) && !isBlackTroops(i, j)) {
                         if (isSelected()) {
                             resetColor();
-                            resetPutTroops();
+                            resetTempPutTroops();
                             IS_TROOPS_SELECTED = false;
                         }
                         switch (whichTroops(i, j)) {
                             case WHITE_PAWN: {
+                                chess_array[i][j].setBackgroundColor(getResources().getColor(R.color.select_troops_color));
                                 whitePawnSelected(i, j);
                                 PREVIOUS_I = i;
                                 PREVIOUS_J = j;
+                                setTempPutTroops();
+                                optimizeTempPutTroops(PREVIOUS_I, PREVIOUS_J);
+                                setColorOnChess();
                                 break;
                             }
                             case WHITE_KNIGHT: {
+                                chess_array[i][j].setBackgroundColor(getResources().getColor(R.color.select_troops_color));
                                 knightSelected(i, j);
                                 PREVIOUS_I = i;
                                 PREVIOUS_J = j;
+                                setTempPutTroops();
+                                optimizeTempPutTroops(PREVIOUS_I, PREVIOUS_J);
+                                setColorOnChess();
                                 break;
                             }
                             case WHITE_ROOK: {
+                                chess_array[i][j].setBackgroundColor(getResources().getColor(R.color.select_troops_color));
                                 rookSelected(i, j);
                                 PREVIOUS_I = i;
                                 PREVIOUS_J = j;
+                                setTempPutTroops();
+                                optimizeTempPutTroops(PREVIOUS_I, PREVIOUS_J);
+                                setColorOnChess();
                                 break;
                             }
                             case WHITE_BISHOP: {
+                                chess_array[i][j].setBackgroundColor(getResources().getColor(R.color.select_troops_color));
                                 bishopSelected(i, j);
                                 PREVIOUS_I = i;
                                 PREVIOUS_J = j;
+                                setTempPutTroops();
+                                optimizeTempPutTroops(PREVIOUS_I, PREVIOUS_J);
+                                setColorOnChess();
                                 break;
                             }
                             case WHITE_QUEEN: {
+                                chess_array[i][j].setBackgroundColor(getResources().getColor(R.color.select_troops_color));
                                 queenSelected(i, j);
                                 PREVIOUS_I = i;
                                 PREVIOUS_J = j;
+                                setTempPutTroops();
+                                optimizeTempPutTroops(PREVIOUS_I, PREVIOUS_J);
+                                setColorOnChess();
                                 break;
                             }
                             case WHITE_KING: {
+                                chess_array[i][j].setBackgroundColor(getResources().getColor(R.color.select_troops_color));
                                 kingSelected(i, j);
                                 PREVIOUS_I = i;
                                 PREVIOUS_J = j;
+                                setTempPutTroops();
+                                optimizeTempPutTroops(PREVIOUS_I, PREVIOUS_J);
+                                setColorOnChess();
                                 break;
                             }
                         }
                         IS_TROOPS_SELECTED = true;
                     } else {
                         if (isSelected()) {
-                            if (putTroops[i][j] == 1) {
-                                chess_array[i][j].setImageResource(troops[PREVIOUS_I][PREVIOUS_J]);
-                                troops[i][j] = troops[PREVIOUS_I][PREVIOUS_J];
-                                troops[PREVIOUS_I][PREVIOUS_J] = 0;
-                                chess_array[PREVIOUS_I][PREVIOUS_J].setImageResource(0);
-                                resetPutTroops();
-                                if (setKingCheck()) {
+
+                            if (tempPutTroops[i][j] == 1) {
+                                if (troops[PREVIOUS_I][PREVIOUS_J] == WHITE_PAWN && i == 7) {
+                                    //Todo
+                                } else {
+                                    chess_array[i][j].setImageResource(troops[PREVIOUS_I][PREVIOUS_J]);
+                                    troops[i][j] = troops[PREVIOUS_I][PREVIOUS_J];
+                                    troops[PREVIOUS_I][PREVIOUS_J] = 0;
+                                    chess_array[PREVIOUS_I][PREVIOUS_J].setImageResource(0);
+                                }
+                                resetTempPutTroops();
+                                if (setKingCheck(WHICH_TROOPS_TURNS)) {
                                     if (isCheckMate()) {
 
                                     } else {
@@ -181,12 +210,11 @@ public class MainActivity extends AppCompatActivity {
 
                                 }
                                 resetColor();
-                                KING_CHECK = false;
                                 IS_TROOPS_SELECTED = false;
                                 WHICH_TROOPS_TURNS = true;
                             } else {
                                 resetColor();
-                                resetPutTroops();
+                                resetTempPutTroops();
                                 IS_TROOPS_SELECTED = false;
                             }
                         }
@@ -196,75 +224,101 @@ public class MainActivity extends AppCompatActivity {
                     if (isTroop(i, j) && isBlackTroops(i, j)) {
                         if (isSelected()) {
                             resetColor();
-                            resetPutTroops();
+                            resetTempPutTroops();
                             IS_TROOPS_SELECTED = false;
                         }
                         switch (whichTroops(i, j)) {
 
                             case BLACK_PAWN: {
+                                chess_array[i][j].setBackgroundColor(getResources().getColor(R.color.select_troops_color));
                                 blackPawnSelected(i, j);
                                 PREVIOUS_I = i;
                                 PREVIOUS_J = j;
+                                setTempPutTroops();
+                                optimizeTempPutTroops(PREVIOUS_I, PREVIOUS_J);
+                                setColorOnChess();
                                 break;
                             }
                             case BLACK_KNIGHT: {
+                                chess_array[i][j].setBackgroundColor(getResources().getColor(R.color.select_troops_color));
                                 knightSelected(i, j);
                                 PREVIOUS_I = i;
                                 PREVIOUS_J = j;
+                                setTempPutTroops();
+                                optimizeTempPutTroops(PREVIOUS_I, PREVIOUS_J);
+                                setColorOnChess();
                                 break;
                             }
 
                             case BLACK_ROOK: {
+                                chess_array[i][j].setBackgroundColor(getResources().getColor(R.color.select_troops_color));
                                 rookSelected(i, j);
                                 PREVIOUS_I = i;
                                 PREVIOUS_J = j;
+                                setTempPutTroops();
+                                optimizeTempPutTroops(PREVIOUS_I, PREVIOUS_J);
+                                setColorOnChess();
                                 break;
                             }
                             case BLACK_BISHOP: {
+                                chess_array[i][j].setBackgroundColor(getResources().getColor(R.color.select_troops_color));
                                 bishopSelected(i, j);
                                 PREVIOUS_I = i;
                                 PREVIOUS_J = j;
+                                setTempPutTroops();
+                                optimizeTempPutTroops(PREVIOUS_I, PREVIOUS_J);
+                                setColorOnChess();
                                 break;
                             }
                             case BLACK_QUEEN: {
+                                chess_array[i][j].setBackgroundColor(getResources().getColor(R.color.select_troops_color));
                                 queenSelected(i, j);
                                 PREVIOUS_I = i;
                                 PREVIOUS_J = j;
+                                setTempPutTroops();
+                                optimizeTempPutTroops(PREVIOUS_I, PREVIOUS_J);
+                                setColorOnChess();
                                 break;
                             }
                             case BLACK_KING: {
+                                chess_array[i][j].setBackgroundColor(getResources().getColor(R.color.select_troops_color));
                                 kingSelected(i, j);
                                 PREVIOUS_I = i;
                                 PREVIOUS_J = j;
+                                setTempPutTroops();
+                                optimizeTempPutTroops(PREVIOUS_I, PREVIOUS_J);
+                                setColorOnChess();
                                 break;
                             }
                         }
                         IS_TROOPS_SELECTED = true;
                     } else {
                         if (isSelected()) {
-                            if (putTroops[i][j] == 1) {
-                                chess_array[i][j].setImageResource(troops[PREVIOUS_I][PREVIOUS_J]);
-                                troops[i][j] = troops[PREVIOUS_I][PREVIOUS_J];
-                                troops[PREVIOUS_I][PREVIOUS_J] = 0;
-                                chess_array[PREVIOUS_I][PREVIOUS_J].setImageResource(0);
-                                resetPutTroops();
-                                if (setKingCheck()) {
+                            if (tempPutTroops[i][j] == 1) {
+                                if (troops[PREVIOUS_I][PREVIOUS_J] == BLACK_PAWN && i == 0) {
+                                    //Todo
+                                } else {
+                                    chess_array[i][j].setImageResource(troops[PREVIOUS_I][PREVIOUS_J]);
+                                    troops[i][j] = troops[PREVIOUS_I][PREVIOUS_J];
+                                    troops[PREVIOUS_I][PREVIOUS_J] = 0;
+                                    chess_array[PREVIOUS_I][PREVIOUS_J].setImageResource(0);
+                                }
+                                resetTempPutTroops();
+                                if (setKingCheck(WHICH_TROOPS_TURNS)) {
                                     if (isCheckMate()) {
 
                                     } else {
-                                        //todo
                                         check_event.setImageResource(R.drawable.check);
                                     }
                                 } else if (isStalemate()) {
 
                                 }
-                                KING_CHECK = false;
                                 resetColor();
                                 IS_TROOPS_SELECTED = false;
                                 WHICH_TROOPS_TURNS = false;
                             } else {
                                 resetColor();
-                                resetPutTroops();
+                                resetTempPutTroops();
                                 IS_TROOPS_SELECTED = false;
                             }
                         }
@@ -321,6 +375,16 @@ public class MainActivity extends AppCompatActivity {
         return IS_TROOPS_SELECTED;
     }
 
+    protected void setColorOnChess() {
+        for (int i = 0; i < 8; ++i) {
+            for (int j = 0; j < 8; ++j) {
+                if (tempPutTroops[i][j] == 1) {
+                    chess_array[i][j].setBackgroundColor(getResources().getColor(R.color.select_troops_color));
+                }
+            }
+        }
+    }
+
     protected void resetColor() {
         for (int i = 0; i < 8; ++i) {
             if (i % 2 == 0) {
@@ -345,32 +409,71 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    protected void setTempPutTroops() {
+        for (int i = 0; i < 8; ++i) {
+            for (int j = 0; j < 8; ++j) {
+                if (putTroops[i][j] == 1) {
+                    tempPutTroops[i][j] = 1;
+                }
+            }
+        }
+        resetPutTroops();
+    }
+
+    protected void optimizeTempPutTroops(final int x, final int y) {
+        for (int i = 0; i < 8; ++i) {
+            for (int j = 0; j < 8; ++j) {
+                if (tempPutTroops[i][j] == 1) {
+                    int temp=troops[i][j];
+                    chess_array[i][j].setImageResource(troops[x][y]);
+                    troops[i][j]=troops[x][y];
+                    troops[x][y]=0;
+                    chess_array[x][y].setImageResource(0);
+                    if (setKingCheck(!WHICH_TROOPS_TURNS)) {
+                        tempPutTroops[i][j]=0;
+                        chess_array[x][y].setImageResource(troops[i][j]);
+                        troops[x][y]=troops[i][j];
+                        troops[i][j]=temp;
+                        chess_array[i][j].setImageResource(troops[i][j]);
+                    }else{
+                        chess_array[x][y].setImageResource(troops[i][j]);
+                        troops[x][y]=troops[i][j];
+                        troops[i][j]=temp;
+                        chess_array[i][j].setImageResource(troops[i][j]);
+                    }
+                }
+            }
+        }
+    }
+
+    protected void resetTempPutTroops() {
+        for (int i = 0; i < 8; ++i) {
+            for (int j = 0; j < 8; ++j) {
+                tempPutTroops[i][j] = 0;
+            }
+        }
+    }
+
     protected void whitePawnSelected(final int i, final int j) {
-        chess_array[i][j].setBackgroundColor(getResources().getColor(R.color.select_troops_color));
         if (i == 1) {
             if (chess_array[i + 1][j].getDrawable() == null) {
-                chess_array[i + 1][j].setBackgroundColor(getResources().getColor(R.color.select_troops_color));
                 putTroops[i + 1][j] = 1;
-            }
-            if (chess_array[i + 2][j].getDrawable() == null) {
-                chess_array[i + 2][j].setBackgroundColor(getResources().getColor(R.color.select_troops_color));
-                putTroops[i + 2][j] = 1;
+                if (chess_array[i + 2][j].getDrawable() == null) {
+                    putTroops[i + 2][j] = 1;
+                }
             }
         } else {
             if (chess_array[i + 1][j].getDrawable() == null) {
-                chess_array[i + 1][j].setBackgroundColor(getResources().getColor(R.color.select_troops_color));
                 putTroops[i + 1][j] = 1;
             }
         }
         if (i + 1 < 8 && j + 1 < 8) {
             if (isBlackTroops(i, j)) {
                 if (!isBlackTroops(i + 1, j + 1)) {
-                    chess_array[i + 1][j + 1].setBackgroundColor(getResources().getColor(R.color.select_troops_color));
                     putTroops[i + 1][j + 1] = 1;
                 }
             } else {
                 if (isBlackTroops(i + 1, j + 1)) {
-                    chess_array[i + 1][j + 1].setBackgroundColor(getResources().getColor(R.color.select_troops_color));
                     putTroops[i + 1][j + 1] = 1;
                 }
             }
@@ -378,12 +481,10 @@ public class MainActivity extends AppCompatActivity {
         if (i + 1 < 8 && j - 1 >= 0) {
             if (isBlackTroops(i, j)) {
                 if (!isBlackTroops(i + 1, j - 1)) {
-                    chess_array[i + 1][j - 1].setBackgroundColor(getResources().getColor(R.color.select_troops_color));
                     putTroops[i + 1][j - 1] = 1;
                 }
             } else {
                 if (isBlackTroops(i + 1, j - 1)) {
-                    chess_array[i + 1][j - 1].setBackgroundColor(getResources().getColor(R.color.select_troops_color));
                     putTroops[i + 1][j - 1] = 1;
                 }
             }
@@ -391,31 +492,26 @@ public class MainActivity extends AppCompatActivity {
     }
 
     protected void blackPawnSelected(final int i, final int j) {
-        chess_array[i][j].setBackgroundColor(getResources().getColor(R.color.select_troops_color));
         if (i == 6) {
             if (chess_array[i - 1][j].getDrawable() == null) {
-                chess_array[i - 1][j].setBackgroundColor(getResources().getColor(R.color.select_troops_color));
                 putTroops[i - 1][j] = 1;
-            }
-            if (chess_array[i - 2][j].getDrawable() == null) {
-                chess_array[i - 2][j].setBackgroundColor(getResources().getColor(R.color.select_troops_color));
-                putTroops[i - 2][j] = 1;
+
+                if (chess_array[i - 2][j].getDrawable() == null) {
+                    putTroops[i - 2][j] = 1;
+                }
             }
         } else {
             if (chess_array[i - 1][j].getDrawable() == null) {
-                chess_array[i - 1][j].setBackgroundColor(getResources().getColor(R.color.select_troops_color));
                 putTroops[i - 1][j] = 1;
             }
         }
         if (i - 1 >= 0 && j - 1 >= 0) {
             if (isBlackTroops(i, j)) {
                 if (!isBlackTroops(i - 1, j - 1) && chess_array[i - 1][j - 1].getDrawable() != null) {
-                    chess_array[i - 1][j - 1].setBackgroundColor(getResources().getColor(R.color.select_troops_color));
                     putTroops[i - 1][j - 1] = 1;
                 }
             } else {
                 if (isBlackTroops(i - 1, j - 1)) {
-                    chess_array[i - 1][j - 1].setBackgroundColor(getResources().getColor(R.color.select_troops_color));
                     putTroops[i - 1][j - 1] = 1;
                 }
             }
@@ -423,12 +519,10 @@ public class MainActivity extends AppCompatActivity {
         if (i - 1 >= 0 && j + 1 < 8) {
             if (isBlackTroops(i, j)) {
                 if (!isBlackTroops(i - 1, j + 1) && chess_array[i - 1][j + 1].getDrawable() != null) {
-                    chess_array[i - 1][j + 1].setBackgroundColor(getResources().getColor(R.color.select_troops_color));
                     putTroops[i - 1][j + 1] = 1;
                 }
             } else {
                 if (isBlackTroops(i - 1, j + 1)) {
-                    chess_array[i - 1][j + 1].setBackgroundColor(getResources().getColor(R.color.select_troops_color));
                     putTroops[i - 1][j + 1] = 1;
                 }
             }
@@ -436,36 +530,29 @@ public class MainActivity extends AppCompatActivity {
     }
 
     protected void knightSelected(final int i, final int j) {
-        chess_array[i][j].setBackgroundColor(getResources().getColor(R.color.select_troops_color));
         if ((i + 2 < 8)) {
             if (j + 1 < 8) {
                 if (chess_array[i + 2][j + 1].getDrawable() == null) {
-                    chess_array[i + 2][j + 1].setBackgroundColor(getResources().getColor(R.color.select_troops_color));
                     putTroops[i + 2][j + 1] = 1;
                 } else if (isBlackTroops(i, j)) {
                     if (!isBlackTroops(i + 2, j + 1)) {
-                        chess_array[i + 2][j + 1].setBackgroundColor(getResources().getColor(R.color.select_troops_color));
                         putTroops[i + 2][j + 1] = 1;
                     }
                 } else {
                     if (isBlackTroops(i + 2, j + 1)) {
-                        chess_array[i + 2][j + 1].setBackgroundColor(getResources().getColor(R.color.select_troops_color));
                         putTroops[i + 2][j + 1] = 1;
                     }
                 }
             }
             if (j - 1 >= 0) {
                 if (chess_array[i + 2][j - 1].getDrawable() == null) {
-                    chess_array[i + 2][j - 1].setBackgroundColor(getResources().getColor(R.color.select_troops_color));
                     putTroops[i + 2][j - 1] = 1;
                 } else if (isBlackTroops(i, j)) {
                     if (!isBlackTroops(i + 2, j - 1)) {
-                        chess_array[i + 2][j - 1].setBackgroundColor(getResources().getColor(R.color.select_troops_color));
                         putTroops[i + 2][j - 1] = 1;
                     }
                 } else {
                     if (isBlackTroops(i + 2, j - 1)) {
-                        chess_array[i + 2][j - 1].setBackgroundColor(getResources().getColor(R.color.select_troops_color));
                         putTroops[i + 2][j - 1] = 1;
                     }
                 }
@@ -475,32 +562,26 @@ public class MainActivity extends AppCompatActivity {
         if ((i - 2 >= 0)) {
             if (j + 1 < 8) {
                 if (chess_array[i - 2][j + 1].getDrawable() == null) {
-                    chess_array[i - 2][j + 1].setBackgroundColor(getResources().getColor(R.color.select_troops_color));
                     putTroops[i - 2][j + 1] = 1;
                 } else if (isBlackTroops(i, j)) {
                     if (!isBlackTroops(i - 2, j + 1)) {
-                        chess_array[i - 2][j + 1].setBackgroundColor(getResources().getColor(R.color.select_troops_color));
                         putTroops[i - 2][j + 1] = 1;
                     }
                 } else {
                     if (isBlackTroops(i - 2, j + 1)) {
-                        chess_array[i - 2][j + 1].setBackgroundColor(getResources().getColor(R.color.select_troops_color));
                         putTroops[i - 2][j + 1] = 1;
                     }
                 }
             }
             if (j - 1 >= 0) {
                 if (chess_array[i - 2][j - 1].getDrawable() == null) {
-                    chess_array[i - 2][j - 1].setBackgroundColor(getResources().getColor(R.color.select_troops_color));
                     putTroops[i - 2][j - 1] = 1;
                 } else if (isBlackTroops(i, j)) {
                     if (!isBlackTroops(i - 2, j - 1)) {
-                        chess_array[i - 2][j - 1].setBackgroundColor(getResources().getColor(R.color.select_troops_color));
                         putTroops[i - 2][j - 1] = 1;
                     }
                 } else {
                     if (isBlackTroops(i - 2, j - 1)) {
-                        chess_array[i - 2][j - 1].setBackgroundColor(getResources().getColor(R.color.select_troops_color));
                         putTroops[i - 2][j - 1] = 1;
                     }
                 }
@@ -510,32 +591,26 @@ public class MainActivity extends AppCompatActivity {
         if ((j + 2 < 8)) {
             if (i + 1 < 8) {
                 if (chess_array[i + 1][j + 2].getDrawable() == null) {
-                    chess_array[i + 1][j + 2].setBackgroundColor(getResources().getColor(R.color.select_troops_color));
                     putTroops[i + 1][j + 2] = 1;
                 } else if (isBlackTroops(i, j)) {
                     if (!isBlackTroops(i + 1, j + 2)) {
-                        chess_array[i + 1][j + 2].setBackgroundColor(getResources().getColor(R.color.select_troops_color));
                         putTroops[i + 1][j + 2] = 1;
                     }
                 } else {
                     if (isBlackTroops(i + 1, j + 2)) {
-                        chess_array[i + 1][j + 2].setBackgroundColor(getResources().getColor(R.color.select_troops_color));
                         putTroops[i + 1][j + 2] = 1;
                     }
                 }
             }
             if (i - 1 >= 0) {
                 if (chess_array[i - 1][j + 2].getDrawable() == null) {
-                    chess_array[i - 1][j + 2].setBackgroundColor(getResources().getColor(R.color.select_troops_color));
                     putTroops[i - 1][j + 2] = 1;
                 } else if (isBlackTroops(i, j)) {
                     if (!isBlackTroops(i - 1, j + 2)) {
-                        chess_array[i - 1][j + 2].setBackgroundColor(getResources().getColor(R.color.select_troops_color));
                         putTroops[i - 1][j + 2] = 1;
                     }
                 } else {
                     if (isBlackTroops(i - 1, j + 2)) {
-                        chess_array[i - 1][j + 2].setBackgroundColor(getResources().getColor(R.color.select_troops_color));
                         putTroops[i - 1][j + 2] = 1;
                     }
                 }
@@ -544,32 +619,26 @@ public class MainActivity extends AppCompatActivity {
         if ((j - 2 >= 0)) {
             if (i + 1 < 8) {
                 if (chess_array[i + 1][j - 2].getDrawable() == null) {
-                    chess_array[i + 1][j - 2].setBackgroundColor(getResources().getColor(R.color.select_troops_color));
                     putTroops[i + 1][j - 2] = 1;
                 } else if (isBlackTroops(i, j)) {
                     if (!isBlackTroops(i + 1, j - 2)) {
-                        chess_array[i + 1][j - 2].setBackgroundColor(getResources().getColor(R.color.select_troops_color));
                         putTroops[i + 1][j - 2] = 1;
                     }
                 } else {
                     if (isBlackTroops(i + 1, j - 2)) {
-                        chess_array[i + 1][j - 2].setBackgroundColor(getResources().getColor(R.color.select_troops_color));
                         putTroops[i + 1][j - 2] = 1;
                     }
                 }
             }
             if (i - 1 >= 0) {
                 if (chess_array[i - 1][j - 2].getDrawable() == null) {
-                    chess_array[i - 1][j - 2].setBackgroundColor(getResources().getColor(R.color.select_troops_color));
                     putTroops[i - 1][j - 2] = 1;
                 } else if (isBlackTroops(i, j)) {
                     if (!isBlackTroops(i - 1, j - 2)) {
-                        chess_array[i - 1][j - 2].setBackgroundColor(getResources().getColor(R.color.select_troops_color));
                         putTroops[i - 1][j - 2] = 1;
                     }
                 } else {
                     if (isBlackTroops(i - 1, j - 2)) {
-                        chess_array[i - 1][j - 2].setBackgroundColor(getResources().getColor(R.color.select_troops_color));
                         putTroops[i - 1][j - 2] = 1;
                     }
                 }
@@ -580,20 +649,16 @@ public class MainActivity extends AppCompatActivity {
     }
 
     protected void rookSelected(final int i, final int j) {
-        chess_array[i][j].setBackgroundColor(getResources().getColor(R.color.select_troops_color));
         for (int k = i + 1; k < 8; ++k) {
             if (chess_array[k][j].getDrawable() == null) {
-                chess_array[k][j].setBackgroundColor(getResources().getColor(R.color.select_troops_color));
                 putTroops[k][j] = 1;
             } else if (isBlackTroops(i, j)) {
                 if (!isBlackTroops(k, j)) {
-                    chess_array[k][j].setBackgroundColor(getResources().getColor(R.color.select_troops_color));
                     putTroops[k][j] = 1;
                 }
                 break;
             } else if (!isBlackTroops(i, j)) {
                 if (isBlackTroops(k, j)) {
-                    chess_array[k][j].setBackgroundColor(getResources().getColor(R.color.select_troops_color));
                     putTroops[k][j] = 1;
                 }
                 break;
@@ -603,17 +668,14 @@ public class MainActivity extends AppCompatActivity {
         }
         for (int k = i - 1; k >= 0; --k) {
             if (chess_array[k][j].getDrawable() == null) {
-                chess_array[k][j].setBackgroundColor(getResources().getColor(R.color.select_troops_color));
                 putTroops[k][j] = 1;
             } else if (isBlackTroops(i, j)) {
                 if (!isBlackTroops(k, j)) {
-                    chess_array[k][j].setBackgroundColor(getResources().getColor(R.color.select_troops_color));
                     putTroops[k][j] = 1;
                 }
                 break;
             } else if (!isBlackTroops(i, j)) {
                 if (isBlackTroops(k, j)) {
-                    chess_array[k][j].setBackgroundColor(getResources().getColor(R.color.select_troops_color));
                     putTroops[k][j] = 1;
                 }
                 break;
@@ -623,17 +685,14 @@ public class MainActivity extends AppCompatActivity {
         }
         for (int k = j + 1; k < 8; ++k) {
             if (chess_array[i][k].getDrawable() == null) {
-                chess_array[i][k].setBackgroundColor(getResources().getColor(R.color.select_troops_color));
                 putTroops[i][k] = 1;
             } else if (isBlackTroops(i, j)) {
                 if (!isBlackTroops(i, k)) {
-                    chess_array[i][k].setBackgroundColor(getResources().getColor(R.color.select_troops_color));
                     putTroops[i][k] = 1;
                 }
                 break;
             } else if (!isBlackTroops(i, j)) {
                 if (isBlackTroops(i, k)) {
-                    chess_array[i][k].setBackgroundColor(getResources().getColor(R.color.select_troops_color));
                     putTroops[i][k] = 1;
                 }
                 break;
@@ -643,17 +702,14 @@ public class MainActivity extends AppCompatActivity {
         }
         for (int k = j - 1; k >= 0; --k) {
             if (chess_array[i][k].getDrawable() == null) {
-                chess_array[i][k].setBackgroundColor(getResources().getColor(R.color.select_troops_color));
                 putTroops[i][k] = 1;
             } else if (isBlackTroops(i, j)) {
                 if (!isBlackTroops(i, k)) {
-                    chess_array[i][k].setBackgroundColor(getResources().getColor(R.color.select_troops_color));
                     putTroops[i][k] = 1;
                 }
                 break;
             } else if (!isBlackTroops(i, j)) {
                 if (isBlackTroops(i, k)) {
-                    chess_array[i][k].setBackgroundColor(getResources().getColor(R.color.select_troops_color));
                     putTroops[i][k] = 1;
                 }
                 break;
@@ -664,20 +720,16 @@ public class MainActivity extends AppCompatActivity {
     }
 
     protected void bishopSelected(final int i, final int j) {
-        chess_array[i][j].setBackgroundColor(getResources().getColor(R.color.select_troops_color));
         for (int x = i + 1, y = j + 1; x < 8 && y < 8; ++x, ++y) {
             if (chess_array[x][y].getDrawable() == null) {
-                chess_array[x][y].setBackgroundColor(getResources().getColor(R.color.select_troops_color));
                 putTroops[x][y] = 1;
             } else if (isBlackTroops(i, j)) {
                 if (!isBlackTroops(x, y)) {
-                    chess_array[x][y].setBackgroundColor(getResources().getColor(R.color.select_troops_color));
                     putTroops[x][y] = 1;
                 }
                 break;
             } else if (!isBlackTroops(i, j)) {
                 if (isBlackTroops(x, y)) {
-                    chess_array[x][y].setBackgroundColor(getResources().getColor(R.color.select_troops_color));
                     putTroops[x][y] = 1;
                 }
                 break;
@@ -687,17 +739,14 @@ public class MainActivity extends AppCompatActivity {
         }
         for (int x = i - 1, y = j - 1; x >= 0 && y >= 0; --x, --y) {
             if (chess_array[x][y].getDrawable() == null) {
-                chess_array[x][y].setBackgroundColor(getResources().getColor(R.color.select_troops_color));
                 putTroops[x][y] = 1;
             } else if (isBlackTroops(i, j)) {
                 if (!isBlackTroops(x, y)) {
-                    chess_array[x][y].setBackgroundColor(getResources().getColor(R.color.select_troops_color));
                     putTroops[x][y] = 1;
                 }
                 break;
             } else if (!isBlackTroops(i, j)) {
                 if (isBlackTroops(x, y)) {
-                    chess_array[x][y].setBackgroundColor(getResources().getColor(R.color.select_troops_color));
                     putTroops[x][y] = 1;
                 }
                 break;
@@ -707,17 +756,14 @@ public class MainActivity extends AppCompatActivity {
         }
         for (int x = i + 1, y = j - 1; x < 8 && y >= 0; ++x, --y) {
             if (chess_array[x][y].getDrawable() == null) {
-                chess_array[x][y].setBackgroundColor(getResources().getColor(R.color.select_troops_color));
                 putTroops[x][y] = 1;
             } else if (isBlackTroops(i, j)) {
                 if (!isBlackTroops(x, y)) {
-                    chess_array[x][y].setBackgroundColor(getResources().getColor(R.color.select_troops_color));
                     putTroops[x][y] = 1;
                 }
                 break;
             } else if (!isBlackTroops(i, j)) {
                 if (isBlackTroops(x, y)) {
-                    chess_array[x][y].setBackgroundColor(getResources().getColor(R.color.select_troops_color));
                     putTroops[x][y] = 1;
                 }
                 break;
@@ -727,17 +773,14 @@ public class MainActivity extends AppCompatActivity {
         }
         for (int x = i - 1, y = j + 1; x >= 0 && y < 8; --x, ++y) {
             if (chess_array[x][y].getDrawable() == null) {
-                chess_array[x][y].setBackgroundColor(getResources().getColor(R.color.select_troops_color));
                 putTroops[x][y] = 1;
             } else if (isBlackTroops(i, j)) {
                 if (!isBlackTroops(x, y)) {
-                    chess_array[x][y].setBackgroundColor(getResources().getColor(R.color.select_troops_color));
                     putTroops[x][y] = 1;
                 }
                 break;
             } else if (!isBlackTroops(i, j)) {
                 if (isBlackTroops(x, y)) {
-                    chess_array[x][y].setBackgroundColor(getResources().getColor(R.color.select_troops_color));
                     putTroops[x][y] = 1;
                 }
                 break;
@@ -753,131 +796,106 @@ public class MainActivity extends AppCompatActivity {
     }
 
     protected void kingSelected(final int i, final int j) {
-        chess_array[i][j].setBackgroundColor(getResources().getColor(R.color.select_troops_color));
         if (i + 1 < 8) {
             if (chess_array[i + 1][j].getDrawable() == null) {
-                chess_array[i + 1][j].setBackgroundColor(getResources().getColor(R.color.select_troops_color));
                 putTroops[i + 1][j] = 1;
             } else if (isBlackTroops(i, j)) {
                 if (!isBlackTroops(i + 1, j)) {
-                    chess_array[i + 1][j].setBackgroundColor(getResources().getColor(R.color.select_troops_color));
                     putTroops[i + 1][j] = 1;
                 }
             } else {
                 if (isBlackTroops(i + 1, j)) {
-                    chess_array[i + 1][j].setBackgroundColor(getResources().getColor(R.color.select_troops_color));
                     putTroops[i + 1][j] = 1;
                 }
             }
         }
         if (i - 1 >= 0) {
             if (chess_array[i - 1][j].getDrawable() == null) {
-                chess_array[i - 1][j].setBackgroundColor(getResources().getColor(R.color.select_troops_color));
                 putTroops[i - 1][j] = 1;
             } else if (isBlackTroops(i, j)) {
                 if (!isBlackTroops(i - 1, j)) {
-                    chess_array[i - 1][j].setBackgroundColor(getResources().getColor(R.color.select_troops_color));
                     putTroops[i - 1][j] = 1;
                 }
             } else {
                 if (isBlackTroops(i - 1, j)) {
-                    chess_array[i - 1][j].setBackgroundColor(getResources().getColor(R.color.select_troops_color));
                     putTroops[i - 1][j] = 1;
                 }
             }
         }
         if (j + 1 < 8) {
             if (chess_array[i][j + 1].getDrawable() == null) {
-                chess_array[i][j + 1].setBackgroundColor(getResources().getColor(R.color.select_troops_color));
                 putTroops[i][j + 1] = 1;
             } else if (isBlackTroops(i, j)) {
                 if (!isBlackTroops(i, j + 1)) {
-                    chess_array[i][j + 1].setBackgroundColor(getResources().getColor(R.color.select_troops_color));
                     putTroops[i][j + 1] = 1;
                 }
             } else {
                 if (isBlackTroops(i, j + 1)) {
-                    chess_array[i][j + 1].setBackgroundColor(getResources().getColor(R.color.select_troops_color));
                     putTroops[i][j + 1] = 1;
                 }
             }
         }
         if (j - 1 >= 0) {
             if (chess_array[i][j - 1].getDrawable() == null) {
-                chess_array[i][j - 1].setBackgroundColor(getResources().getColor(R.color.select_troops_color));
                 putTroops[i][j - 1] = 1;
             } else if (isBlackTroops(i, j)) {
                 if (!isBlackTroops(i, j - 1)) {
-                    chess_array[i][j - 1].setBackgroundColor(getResources().getColor(R.color.select_troops_color));
                     putTroops[i][j - 1] = 1;
                 }
             } else {
                 if (isBlackTroops(i, j - 1)) {
-                    chess_array[i][j - 1].setBackgroundColor(getResources().getColor(R.color.select_troops_color));
                     putTroops[i][j - 1] = 1;
                 }
             }
         }
         if (i + 1 < 8 && j + 1 < 8) {
             if (chess_array[i + 1][j + 1].getDrawable() == null) {
-                chess_array[i + 1][j + 1].setBackgroundColor(getResources().getColor(R.color.select_troops_color));
                 putTroops[i + 1][j + 1] = 1;
             } else if (isBlackTroops(i, j)) {
                 if (!isBlackTroops(i + 1, j + 1)) {
-                    chess_array[i + 1][j + 1].setBackgroundColor(getResources().getColor(R.color.select_troops_color));
                     putTroops[i + 1][j + 1] = 1;
                 }
             } else {
                 if (isBlackTroops(i + 1, j + 1)) {
-                    chess_array[i + 1][j + 1].setBackgroundColor(getResources().getColor(R.color.select_troops_color));
                     putTroops[i + 1][j + 1] = 1;
                 }
             }
         }
         if (i - 1 >= 0 && j - 1 >= 0) {
             if (chess_array[i - 1][j - 1].getDrawable() == null) {
-                chess_array[i - 1][j - 1].setBackgroundColor(getResources().getColor(R.color.select_troops_color));
                 putTroops[i - 1][j - 1] = 1;
             } else if (isBlackTroops(i, j)) {
                 if (!isBlackTroops(i - 1, j - 1)) {
-                    chess_array[i - 1][j - 1].setBackgroundColor(getResources().getColor(R.color.select_troops_color));
                     putTroops[i - 1][j - 1] = 1;
                 }
             } else {
                 if (isBlackTroops(i - 1, j - 1)) {
-                    chess_array[i - 1][j - 1].setBackgroundColor(getResources().getColor(R.color.select_troops_color));
                     putTroops[i - 1][j - 1] = 1;
                 }
             }
         }
         if (i + 1 < 8 && j - 1 >= 0) {
             if (chess_array[i + 1][j - 1].getDrawable() == null) {
-                chess_array[i + 1][j - 1].setBackgroundColor(getResources().getColor(R.color.select_troops_color));
                 putTroops[i + 1][j - 1] = 1;
             } else if (isBlackTroops(i, j)) {
                 if (!isBlackTroops(i + 1, j - 1)) {
-                    chess_array[i + 1][j - 1].setBackgroundColor(getResources().getColor(R.color.select_troops_color));
                     putTroops[i + 1][j - 1] = 1;
                 }
             } else {
                 if (isBlackTroops(i + 1, j - 1)) {
-                    chess_array[i + 1][j - 1].setBackgroundColor(getResources().getColor(R.color.select_troops_color));
                     putTroops[i + 1][j - 1] = 1;
                 }
             }
         }
         if (i - 1 >= 0 && j + 1 < 8) {
             if (chess_array[i - 1][j + 1].getDrawable() == null) {
-                chess_array[i - 1][j + 1].setBackgroundColor(getResources().getColor(R.color.select_troops_color));
                 putTroops[i - 1][j + 1] = 1;
             } else if (isBlackTroops(i, j)) {
                 if (!isBlackTroops(i - 1, j + 1)) {
-                    chess_array[i - 1][j + 1].setBackgroundColor(getResources().getColor(R.color.select_troops_color));
                     putTroops[i - 1][j + 1] = 1;
                 }
             } else {
                 if (isBlackTroops(i - 1, j + 1)) {
-                    chess_array[i - 1][j + 1].setBackgroundColor(getResources().getColor(R.color.select_troops_color));
                     putTroops[i - 1][j + 1] = 1;
                 }
             }
@@ -888,17 +906,19 @@ public class MainActivity extends AppCompatActivity {
         return WHICH_TROOPS_TURNS;
     }
 
-    protected boolean setKingCheck() {
-        if (!WHICH_TROOPS_TURNS) {
+    protected boolean setKingCheck(boolean temp) {
+        if (!temp) {
             for (int i = 0; i < 8; ++i) {
                 for (int j = 0; j < 8; ++j) {
-                    if (!isBlackTroops(i, j)) {
+                    resetPutTroops();
+                    if (!isBlackTroops(i, j) && chess_array[i][j].getDrawable() != null) {
                         if (troops[i][j] == WHITE_PAWN) {
                             whitePawnSelected(i, j);
                             for (int x = 0; x < 8; x++) {
                                 for (int y = 0; y < 8; ++y) {
                                     if (putTroops[x][y] == 1 && troops[x][y] == BLACK_KING) {
-                                        KING_CHECK = true;
+                                        resetPutTroops();
+                                        return true;
                                     }
                                 }
                             }
@@ -907,7 +927,8 @@ public class MainActivity extends AppCompatActivity {
                             for (int x = 0; x < 8; x++) {
                                 for (int y = 0; y < 8; ++y) {
                                     if (putTroops[x][y] == 1 && troops[x][y] == BLACK_KING) {
-                                        KING_CHECK = true;
+                                        resetPutTroops();
+                                        return true;
                                     }
                                 }
                             }
@@ -916,7 +937,8 @@ public class MainActivity extends AppCompatActivity {
                             for (int x = 0; x < 8; x++) {
                                 for (int y = 0; y < 8; ++y) {
                                     if (putTroops[x][y] == 1 && troops[x][y] == BLACK_KING) {
-                                        KING_CHECK = true;
+                                        resetPutTroops();
+                                        return true;
                                     }
                                 }
                             }
@@ -925,7 +947,8 @@ public class MainActivity extends AppCompatActivity {
                             for (int x = 0; x < 8; x++) {
                                 for (int y = 0; y < 8; ++y) {
                                     if (putTroops[x][y] == 1 && troops[x][y] == BLACK_KING) {
-                                        KING_CHECK = true;
+                                        resetPutTroops();
+                                        return true;
                                     }
                                 }
                             }
@@ -935,7 +958,8 @@ public class MainActivity extends AppCompatActivity {
                                 for (int x = 0; x < 8; x++) {
                                     for (int y = 0; y < 8; ++y) {
                                         if (putTroops[x][y] == 1 && troops[x][y] == BLACK_KING) {
-                                            KING_CHECK = true;
+                                            resetPutTroops();
+                                            return true;
                                         }
                                     }
                                 }
@@ -944,8 +968,7 @@ public class MainActivity extends AppCompatActivity {
                     }
                 }
             }
-        }
-        if (WHICH_TROOPS_TURNS) {
+        } else {
             for (int i = 0; i < 8; ++i) {
                 for (int j = 0; j < 8; ++j) {
                     if (isBlackTroops(i, j)) {
@@ -954,7 +977,8 @@ public class MainActivity extends AppCompatActivity {
                             for (int x = 0; x < 8; x++) {
                                 for (int y = 0; y < 8; ++y) {
                                     if (putTroops[x][y] == 1 && troops[x][y] == WHITE_KING) {
-                                        KING_CHECK = true;
+                                        resetPutTroops();
+                                        return true;
                                     }
                                 }
                             }
@@ -963,7 +987,8 @@ public class MainActivity extends AppCompatActivity {
                             for (int x = 0; x < 8; x++) {
                                 for (int y = 0; y < 8; ++y) {
                                     if (putTroops[x][y] == 1 && troops[x][y] == WHITE_KING) {
-                                        KING_CHECK = true;
+                                        resetPutTroops();
+                                        return true;
                                     }
                                 }
                             }
@@ -972,7 +997,8 @@ public class MainActivity extends AppCompatActivity {
                             for (int x = 0; x < 8; x++) {
                                 for (int y = 0; y < 8; ++y) {
                                     if (putTroops[x][y] == 1 && troops[x][y] == WHITE_KING) {
-                                        KING_CHECK = true;
+                                        resetPutTroops();
+                                        return true;
                                     }
                                 }
                             }
@@ -981,7 +1007,8 @@ public class MainActivity extends AppCompatActivity {
                             for (int x = 0; x < 8; x++) {
                                 for (int y = 0; y < 8; ++y) {
                                     if (putTroops[x][y] == 1 && troops[x][y] == WHITE_KING) {
-                                        KING_CHECK = true;
+                                        resetPutTroops();
+                                        return true;
                                     }
                                 }
                             }
@@ -991,7 +1018,8 @@ public class MainActivity extends AppCompatActivity {
                                 for (int x = 0; x < 8; x++) {
                                     for (int y = 0; y < 8; ++y) {
                                         if (putTroops[x][y] == 1 && troops[x][y] == WHITE_KING) {
-                                            KING_CHECK = true;
+                                            resetPutTroops();
+                                            return true;
                                         }
                                     }
                                 }
@@ -1002,7 +1030,7 @@ public class MainActivity extends AppCompatActivity {
             }
         }
         resetPutTroops();
-        return KING_CHECK;
+        return false;
     }
 
     protected boolean isCheckMate() {
@@ -1025,7 +1053,9 @@ public class MainActivity extends AppCompatActivity {
         KING_CHECK = false;
         CHECK_MATE = false;
         setInitialTroops();
+        check_event.setImageResource(0);
         resetColor();
+        resetTempPutTroops();
         resetPutTroops();
     }
 }
